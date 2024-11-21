@@ -36,10 +36,10 @@ class CausalSelfAttention(nn.Module):
         self.c_attn = nn.Linear(config.n_embd, 3 * config.n_embd)
         # output projection
         self.c_proj = nn.Linear(config.n_embd, config.n_embd)
-        self.c_proj.NANOGPT_SCALE_INIT = 1 
+        self.c_proj.NANOGPT_SCALE_INIT = 1
         # regularization
         self.n_head = config.n_head
-        self.n_embd = config.n_embd 
+        self.n_embd = config.n_embd
         # not really a "bias", more of a mask
         self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size)).view(1, 1 , config.block_size, config.block_size))
 
@@ -59,7 +59,7 @@ class CausalSelfAttention(nn.Module):
         att = (q @ k.transpose(-2,-1)) * (1.0 / math.sqrt(k.size(-1)))
         att = att.masked_fill(self.bias[:,:,:T,:T] == 0, float('-inf')) # This makes sure that the preddiction is not going to be influenced by future characters,
         att = torch.clamp(att, min=-10, max=10)  # Clamp the attention scores to avoid extreme values
-        att = F.softmax(att, dim = 1) # only the ones that precede the current one 
+        att = F.softmax(att, dim = 1) # only the ones that precede the current one
 
         y = att @ v #(B, nh, T, T) @ (B, nh, T, hs) -> (B, nh, T, hs)
         y = y.transpose(1,2).contiguous().view(B, T, C) #reassemble head outputs through concatenation
@@ -95,7 +95,7 @@ class Block(nn.Module):
         """
         Forward pass
         Attention -> tokens communicate
-        MLP -> operation that happens to each token, independently of the other tokens 
+        MLP -> operation that happens to each token, independently of the other tokens
         """
         x = x + self.attention(self.ln_1(x))
         x = x + self.mlp(self.ln_2(x))
@@ -111,7 +111,7 @@ class GPT(nn.Module):
             wte = nn.Embedding(config.vocab_size, config.n_embd), # weights of the token embeddings
             wpe = nn.Embedding(config.block_size, config.n_embd), # weights of the position embeddings
             hidden_modules = nn.ModuleList([Block(config) for _ in range (config.n_layer)]), # initialize the layers
-            final_layer_norm = nn.LayerNorm(config.n_embd) 
+            final_layer_norm = nn.LayerNorm(config.n_embd)
         ))
 
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias = False)
@@ -126,7 +126,7 @@ class GPT(nn.Module):
         if isinstance(module, nn.Linear):
             std = 0.02
             if hasattr(module, 'NANOGPT_SCALE_INIT'):
-                std *= (2 * self.config.n_layer) ** -0.5   
+                std *= (2 * self.config.n_layer) ** -0.5
             torch.nn.init.normal_(module.weight, mean = 0.0, std = std)
             if module.bias is not None:
                 torch.nn.init.zeros_(module.bias)
@@ -147,7 +147,7 @@ class GPT(nn.Module):
         # forward the final layer norm and the classifier
         x = self.transformer.final_layer_norm(x)
         logits = self.lm_head(x) # shape (B, T, vocab size)
-        loss = None 
+        loss = None
         if targets is not None:
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
         return logits, loss

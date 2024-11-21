@@ -8,7 +8,7 @@ torch._dynamo.config.suppress_errors = True
 import inspect
 import os
 import numpy as np
-from train import load_tokens
+from train import *
 
 # ----------------------------------------
 

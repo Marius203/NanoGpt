@@ -4,7 +4,7 @@ from classes import *
 model.eval()
 num_return_sequences = 4
 max_length = 70
-tokens = enc.encode("Hello, I am a language model,")
+tokens = enc.encode("Hello")
 tokens = torch.tensor(tokens, dtype=torch.long)
 tokens = tokens.unsqueeze(0).repeat(num_return_sequences, 1)
 xgen = tokens.to(device)
