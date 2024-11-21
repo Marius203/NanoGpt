@@ -233,5 +233,3 @@ class DataLoader:
             self.tokens = load_tokens(self.shards[self.current_shard])
             self.currnet_position = B*T
         return x, y
-
-import os
