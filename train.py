@@ -1,5 +1,10 @@
-from classes import *
-
+from classes import DataLoader, GPTConfig, CausalSelfAttention, MLP, Block, GPT
+import tiktoken
+import numpy as np
+import torch
+import os
+import math
+from torch.nn import functional as F
 
 
 num_return_sequences = 5
@@ -8,14 +13,6 @@ device = 'cuda'
 min_train_loss = 10
 
 #---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-# Prefix tokens
-import tiktoken
-
-def load_tokens(filename):
-    npt = np.load(filename)
-    ptt = torch.tensor(npt, dtype=torch.long)
-    return ptt
 
 # Function to save the checkpoint
 def save_checkpoint(model, optimizer, step, path="gpt_checkpoint.pth"):

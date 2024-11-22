@@ -8,9 +8,12 @@ torch._dynamo.config.suppress_errors = True
 import inspect
 import os
 import numpy as np
-from train import load_tokens
-
 # ----------------------------------------
+
+def load_tokens(filename):
+    npt = np.load(filename)
+    ptt = torch.tensor(npt, dtype=torch.long)
+    return ptt
 
 # Check if CUDA is available
 if torch.cuda.is_available():
